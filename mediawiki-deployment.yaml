@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: mediawiki
+  name: mediawiki
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: mediawiki
+  template:
+    metadata:
+      labels:
+        service: mediawiki
+    spec:
+      volumes:
+      - name: data
+        ConfigMap:
+          name: pod-data
+          items:
+          - key: "data.csv"
+            path: "data.csv" 
+      containers:
+      - image: ghoshamit/mywiki
+        imagePullPolicy: Always
+        name: mediawiki
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: data
+          mountPath: /opt
+          subPath: data.csv
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
